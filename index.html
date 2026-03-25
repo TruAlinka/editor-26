@@ -22,11 +22,11 @@
     #generate-btn:hover { background-color: #0056b3; }
     #lang-toggle { padding: 8px 12px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
     #lang-toggle:hover { background-color: #5a6268; }
-    #output-iframe { font-family: monospace; white-space: pre-wrap; background-color: #2d2d2d; color: #f1f1f1; height: 200px; border-radius: 4px; margin-top: 5px; resize: vertical; }
+    #output-code, #output-iframe { font-family: monospace; white-space: pre-wrap; background-color: #2d2d2d; color: #f1f1f1; height: 150px; border-radius: 4px; margin-top: 5px; resize: vertical; }
     #preview-container { width: 100%; height: 720px; border: 1px solid #ccc; border-radius: 4px; }
     .help-text { font-size: 14px; color: #666; margin-top: 5px; background: #f9f9f9; padding: 10px; border-radius: 4px; }
-    button.copy-btn { margin-top: 8px; width: fit-content; background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 14px; margin-bottom: 10px; }
-    button.copy-btn:hover { background-color: #0056b3; }
+    button.copy-btn, button.download-btn { margin-top: 8px; width: fit-content; background-color: #007bff; color: white; border: none; border-radius: 4px; padding: 5px 12px; cursor: pointer; font-size: 14px; margin-bottom: 10px; }
+    button.copy-btn:hover, button.download-btn:hover { background-color: #0056b3; }
   </style>
 </head>
 <body>
@@ -86,12 +86,16 @@
     </select>
     <input type="url" id="final-effect-custom-url" placeholder="https://example.com/your.gif" style="display:none;" />
 
-    <button id="generate-btn">Сгенерировать игру и обновить превью</button>
+    <button id="generate-btn">Сгенерировать и обновить превью</button>
 
-    <h2 id="section-code">6. Готовый код для вставки</h2>
-    <label for="output-iframe" id="label-output-iframe">Скопируйте этот код и вставьте в Genially:</label>
+    <h2 id="section-code">6. Готовый код</h2>
+    <label for="output-iframe" id="label-output-iframe">1. Код для вставки в Genially:</label>
     <button id="copy-iframe-btn" class="copy-btn">Скопировать</button>
     <textarea id="output-iframe" readonly></textarea>
+    
+    <label for="output-code" id="label-output-code">2. Полный HTML-код (альтернатива):</label>
+    <button id="download-html-btn" class="download-btn">Скачать HTML</button>
+    <textarea id="output-code" readonly style="height: 80px;"></textarea>
   </div>
 
   <div class="preview">
@@ -101,8 +105,8 @@
 
 <script>
 const translations = {
-    ru: { editorTitle: "Редактор Игры", previewTitle: "Превью Игры", sectionGeneral: "1. Общие настройки", labelGameTitle: "Название/тема игры:", sectionAppearance: "2. Внешний вид", labelBgColor: "Цвет фона:", labelTransparentBg: "Сделать фон прозрачным", labelDefinitionBgColor: "Фон блока вопроса:", labelBtnCheckBgColor: 'Цвет фона "Проверить":', labelBtnCheckTextColor: 'Цвет текста "Проверить":', labelBtnRestartBgColor: 'Цвет фона "Сброс":', labelBtnRestartTextColor: 'Цвет текста "Сброс":', labelBtnRadius: "Скругленность углов:", sectionGameType: "3. Тип игры", labelGameType: "Выберите тип задания:", sectionContent: "4. Содержимое игры", labelGameData: "Вопросы и ответы:", helpText: "Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b>", sectionFeedback: "5. Обратная связь", labelFeedbackCorrect: "Текст при верном ответе:", labelFeedbackCorrectImg: "Изображение (URL):", labelFeedbackIncorrect: "Текст при неверном ответе:", labelFeedbackIncorrectImg: "Изображение (URL):", labelFeedbackFinal: "Текст по завершении игры:", labelFinalEffectSelect: "Финальный эффект:", generateBtn: "Сгенерировать игру и обновить превью", sectionCode: "6. Готовый код для вставки", labelOutputIframe: "Скопируйте этот код и вставьте в Genially:", copySuccess: "Код скопирован!"},
-    en: { editorTitle: "Game Editor", previewTitle: "Game Preview", sectionGeneral: "1. General Settings", labelGameTitle: "Game Title/Theme:", sectionAppearance: "2. Appearance", labelBgColor: "Background Color:", labelTransparentBg: "Make background transparent", labelDefinitionBgColor: "Question block background:", labelBtnCheckBgColor: "Check button background:", labelBtnCheckTextColor: "Check button text:", labelBtnRestartBgColor: "Restart button background:", labelBtnRestartTextColor: "Restart button text:", labelBtnRadius: "Button corner rounding:", sectionGameType: "3. Game Type", labelGameType: "Choose task type:", sectionContent: "4. Game Content", labelGameData: "Questions and Answers:", helpText: "Format: <b>Question | Answer | Image URL (optional)</b>", sectionFeedback: "5. Feedback", labelFeedbackCorrect: "Text for correct answer:", labelFeedbackCorrectImg: "Image (URL):", labelFeedbackIncorrect: "Text for incorrect answer:", labelFeedbackIncorrectImg: "Image (URL):", labelFeedbackFinal: "Text for game completion:", labelFinalEffectSelect: "Final Effect:", generateBtn: "Generate Game & Update Preview", sectionCode: "6. Final Code to Embed", labelOutputIframe: "Copy this code and paste it into Genially:", copySuccess: "Code copied!" }
+    ru: { editorTitle: "Редактор Игры", previewTitle: "Превью Игры", sectionGeneral: "1. Общие настройки", labelGameTitle: "Название/тема игры:", sectionAppearance: "2. Внешний вид", labelBgColor: "Цвет фона:", labelTransparentBg: "Сделать фон прозрачным", labelDefinitionBgColor: "Фон блока вопроса:", labelBtnCheckBgColor: 'Цвет фона "Проверить":', labelBtnCheckTextColor: 'Цвет текста "Проверить":', labelBtnRestartBgColor: 'Цвет фона "Сброс":', labelBtnRestartTextColor: 'Цвет текста "Сброс":', labelBtnRadius: "Скругленность углов:", sectionGameType: "3. Тип игры", labelGameType: "Выберите тип задания:", sectionContent: "4. Содержимое игры", labelGameData: "Вопросы и ответы:", helpText: "Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b>", sectionFeedback: "5. Обратная связь", labelFeedbackCorrect: "Текст при верном ответе:", labelFeedbackCorrectImg: "Изображение (URL):", labelFeedbackIncorrect: "Текст при неверном ответе:", labelFeedbackIncorrectImg: "Изображение (URL):", labelFeedbackFinal: "Текст по завершении игры:", labelFinalEffectSelect: "Финальный эффект:", generateBtn: "Сгенерировать и обновить превью", sectionCode: "6. Готовый код", labelOutputIframe: "1. Код для вставки в Genially:", labelOutputCode: "2. Полный HTML-код (альтернатива):", copySuccess: "Код скопирован!", downloadSuccess: "Файл скачан!" },
+    en: { editorTitle: "Game Editor", previewTitle: "Game Preview", sectionGeneral: "1. General Settings", labelGameTitle: "Game Title/Theme:", sectionAppearance: "2. Appearance", labelBgColor: "Background Color:", labelTransparentBg: "Make background transparent", labelDefinitionBgColor: "Question block background:", labelBtnCheckBgColor: "Check button background:", labelBtnCheckTextColor: "Check button text:", labelBtnRestartBgColor: "Restart button background:", labelBtnRestartTextColor: "Restart button text:", labelBtnRadius: "Button corner rounding:", sectionGameType: "3. Game Type", labelGameType: "Choose task type:", sectionContent: "4. Game Content", labelGameData: "Questions and Answers:", helpText: "Format: <b>Question | Answer | Image URL (optional)</b>", sectionFeedback: "5. Feedback", labelFeedbackCorrect: "Text for correct answer:", labelFeedbackCorrectImg: "Image (URL):", labelFeedbackIncorrect: "Text for incorrect answer:", labelFeedbackIncorrectImg: "Image (URL):", labelFeedbackFinal: "Text for game completion:", labelFinalEffectSelect: "Final Effect:", generateBtn: "Generate & Update Preview", sectionCode: "6. Final Code", labelOutputIframe: "1. Code to embed in Genially:", labelOutputCode: "2. Full HTML (alternative):", copySuccess: "Code copied!", downloadSuccess: "File downloaded!" }
 };
 let currentLang = "ru";
 
@@ -123,6 +127,8 @@ function generateGame() {
     }).filter(Boolean);
 
     const gameHtml = s.gameType === 'anagram' ? generateAnagramGame(s, gameData) : generateInputGame(s, gameData);
+
+    document.getElementById('output-code').value = gameHtml;
     
     const escapedHtml = gameHtml.replace(/"/g, '&quot;');
     document.getElementById('output-iframe').value = `<iframe srcdoc="${escapedHtml}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" title="${s.gameTitle}"></iframe>`;
@@ -151,7 +157,7 @@ function generateAnagramGame(s, data) { const css = generateBaseCss(s) + `#clear
 function generateInputGame(s, data) { const css = generateBaseCss(s) + `#answer-input{width:60%;padding:10px;font-size:1.1em;text-align:center;border:2px solid #ccc;border-radius:${s.btnRadius}px} #answer-input:focus{border-color:${s.btnCheckBgColor};outline:0} .controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}`; const settingsJs = {correctText:s.feedbackCorrect,correctImg:s.feedbackCorrectImg,incorrectText:s.feedbackIncorrect,incorrectImg:s.feedbackIncorrectImg,finalText:s.feedbackFinal}; const js = `let i=0;const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";const E={h:document.querySelector("h1"),img:document.getElementById("game-image"),def:document.querySelector(".definition"),inp:document.getElementById("answer-input"),fb:document.getElementById("feedback"),fbi:document.getElementById("feedback-image"),ctrls:document.querySelector(".controls")};function showFbImg(u){E.fbi.src=u;E.fbi.style.display=u?"block":"none"}function l(){showFbImg(null);E.fb.textContent="";if(i>=d.length){E.def.textContent=s.finalText;E.img.style.display="none";E.ctrls.style.display="none";if(u){const e=document.createElement("div");e.className="final-overlay";e.innerHTML=\`<img src="\${u}">\`;e.onclick=()=>e.remove();document.body.appendChild(e)}return}const{q,img}=d[i];E.def.textContent=q;E.img.src=img;E.img.style.display=img?"block":"none";E.ctrls.style.display="flex";E.inp.value="";E.inp.focus()}function check(){if(E.inp.value.trim()==="")return;const t=E.inp.value.trim().toLowerCase(),a=d[i].a.trim().toLowerCase();if(t===a){E.fb.textContent=s.correctText;E.fb.className="correct";showFbImg(s.correctImg);i++;setTimeout(l,1500)}else{E.fb.textContent=s.incorrectText;E.fb.className="error";showFbImg(s.incorrectImg)}}E.ctrls.querySelector("#check-btn").onclick=check;E.inp.onkeydown=e=>"Enter"===e.key&&check();l();`; return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${s.gameTitle}</title><style>${css}</style></head><body><div class="container"><h1>${s.gameTitle}</h1><img id="game-image" src=""><p class="definition"></p><div class="controls"><input type="text" id="answer-input" placeholder="Введите ответ..."><button id="check-btn" class="button">Проверить</button></div><p id="feedback"></p><img id="feedback-image"></div><script>${js}<\/script></body></html>`;}
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Generate game only on button click
+    // Generate game only on button click, NOT on every input change.
     document.getElementById('generate-btn').addEventListener('click', generateGame);
 
     document.getElementById('lang-toggle').addEventListener("click", () => {
@@ -165,6 +171,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    document.getElementById('download-html-btn').addEventListener("click", () => {
+        const blob = new Blob([document.getElementById('output-code').value], { type: "text/html" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${getSettings().gameTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'game'}.html`;
+        a.click();
+        URL.revokeObjectURL(a.href);
+    });
+
     document.getElementById('final-effect-select').addEventListener('change', (e) => {
         document.getElementById('final-effect-custom-url').style.display = e.target.value === 'custom' ? 'block' : 'none';
     });
@@ -173,9 +188,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('bg-color').disabled = e.target.checked;
     });
 
-    // Initial setup
     setLanguage("ru");
-    generateGame();
+    generateGame(); // Initial generation on page load
 });
 </script>
 </body>
