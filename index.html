@@ -22,7 +22,7 @@
     #generate-btn:hover { background-color: #0056b3; }
     #lang-toggle { padding: 8px 12px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
     #lang-toggle:hover { background-color: #5a6268; }
-    #output-code, #output-iframe, #output-github-iframe { font-family: monospace; white-space: pre-wrap; background-color: #2d2d2d; color: #f1f1f1; height: 120px; border-radius: 4px; margin-top: 5px; resize: vertical; }
+    #output-code, #output-iframe { font-family: monospace; white-space: pre-wrap; background-color: #2d2d2d; color: #f1f1f1; height: 150px; border-radius: 4px; margin-top: 5px; resize: vertical; }
     #preview-container { width: 100%; height: 720px; border: 1px solid #ccc; border-radius: 4px; }
     .help-text { font-size: 14px; color: #666; margin-top: 5px; background: #f9f9f9; padding: 10px; border-radius: 4px; }
     .feedback-image-input { font-weight: normal; font-size: 14px; }
@@ -121,29 +121,14 @@
     <button id="generate-btn">Сгенерировать код</button>
 
     <h2 id="section-code">6. Готовый код</h2>
+    <label for="output-iframe" id="label-output-iframe">Код для вставки в Genially (iframe):</label>
+    <button id="copy-iframe-btn" class="copy-btn">Скопировать</button>
+    <textarea id="output-iframe" readonly></textarea>
+
     <label for="output-code" id="label-output-code">Полный HTML-код (для скачивания):</label>
     <button id="copy-html-btn" class="copy-btn">Скопировать</button>
     <button id="download-html-btn" class="download-btn">Скачать HTML</button>
     <textarea id="output-code" readonly></textarea>
-    
-    <label for="output-iframe" id="label-output-iframe">Код для вставки (iframe с srcdoc, для некоторых платформ):</label>
-    <button id="copy-iframe-btn" class="copy-btn">Скопировать</button>
-    <textarea id="output-iframe" readonly></textarea>
-
-    <!-- НОВЫЙ БЛОК НАЧАЛО -->
-    <h2 id="section-github">7. Код для вставки с GitHub (для Genially)</h2>
-    <div class="help-text" id="help-text-github">
-      <b>1.</b> Скачайте HTML-файл (кнопка выше).<br>
-      <b>2.</b> Загрузите его на GitHub и опубликуйте через GitHub Pages.<br>
-      <b>3.</b> Вставьте сюда полученную ссылку (вида https://.../game.html).<br>
-      <b>4.</b> Скопируйте готовый код iframe для Genially ниже.
-    </div>
-    <label for="github-url" id="label-github-url">URL файла на GitHub Pages:</label>
-    <input type="url" id="github-url" placeholder="https://your-user.github.io/repo/game.html">
-    <label for="output-github-iframe" id="label-output-github-iframe">Готовый код для Genially:</label>
-    <button id="copy-github-iframe-btn" class="copy-btn">Скопировать</button>
-    <textarea id="output-github-iframe" readonly></textarea>
-    <!-- НОВЫЙ БЛОК КОНЕЦ -->
   </div>
 
   <div class="preview">
@@ -154,15 +139,12 @@
 <script>
 // --- TRANSLATIONS AND UI ELEMENTS ---
 const translations = {
-    ru: { editorTitle: "Редактор Игры", previewTitle: "Превью Игры", sectionGeneral: "1. Общие настройки", labelGameTitle: "Название/тема игры:", sectionAppearance: "2. Внешний вид", labelBgColor: "Цвет фона:", labelDefinitionBgColor: "Фон блока вопроса:", labelBtnCheckBgColor: 'Цвет фона "Проверить":', labelBtnCheckTextColor: 'Цвет текста "Проверить":', labelBtnRestartBgColor: 'Цвет фона "Сброс":', labelBtnRestartTextColor: 'Цвет текста "Сброс":', labelBtnRadius: "Скругленность углов:", sectionGameType: "3. Тип игры", labelGameType: "Выберите тип задания:", sectionContent: "4. Содержимое игры", labelGameData: "Вопросы и ответы:", helpText: "Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b>", sectionFeedback: "5. Обратная связь", labelFeedbackCorrect: "Текст при верном ответе:", labelFeedbackCorrectImg: "Изображение (URL):", labelFeedbackIncorrect: "Текст при неверном ответе:", labelFeedbackIncorrectImg: "Изображение (URL):", labelFeedbackFinal: "Текст по завершении игры:", labelFinalEffectSelect: "Финальный эффект:", generateBtn: "Сгенерировать код", sectionCode: "6. Готовый код", labelOutputIframe: "Код для вставки (iframe с srcdoc, для некоторых платформ):", labelOutputCode: "Полный HTML-код (для скачивания):", sectionGithub: "7. Код для вставки с GitHub (для Genially)", helpTextGithub: "<b>1.</b> Скачайте HTML-файл (кнопка выше).<br><b>2.</b> Загрузите его на GitHub и опубликуйте через GitHub Pages.<br><b>3.</b> Вставьте сюда полученную ссылку (вида https://.../game.html).<br><b>4.</b> Скопируйте готовый код iframe для Genially ниже.", labelGithubUrl: "URL файла на GitHub Pages:", labelOutputGithubIframe: "Готовый код для Genially:", copySuccess: "Код скопирован!", downloadSuccess: "Файл скачан!" },
-    en: { editorTitle: "Game Editor", previewTitle: "Game Preview", sectionGeneral: "1. General Settings", labelGameTitle: "Game Title/Theme:", sectionAppearance: "2. Appearance", labelBgColor: "Background Color:", labelDefinitionBgColor: "Question block background:", labelBtnCheckBgColor: "Check button background:", labelBtnCheckTextColor: "Check button text:", labelBtnRestartBgColor: "Restart button background:", labelBtnRestartTextColor: "Restart button text:", labelBtnRadius: "Button corner rounding:", sectionGameType: "3. Game Type", labelGameType: "Choose task type:", sectionContent: "4. Game Content", labelGameData: "Questions and Answers:", helpText: "Format: <b>Question | Answer | Image URL (optional)</b>", sectionFeedback: "5. Feedback", labelFeedbackCorrect: "Text for correct answer:", labelFeedbackCorrectImg: "Image (URL):", labelFeedbackIncorrect: "Text for incorrect answer:", labelFeedbackIncorrectImg: "Image (URL):", labelFeedbackFinal: "Text for game completion:", labelFinalEffectSelect: "Final Effect:", generateBtn: "Generate Code", sectionCode: "6. Resulting Code", labelOutputIframe: "Code for embedding (iframe with srcdoc, for some platforms):", labelOutputCode: "Full HTML code (for download):", sectionGithub: "7. Code for embedding from GitHub (for Genially)", helpTextGithub: "<b>1.</b> Download the HTML file (button above).<br><b>2.</b> Upload it to GitHub and publish via GitHub Pages.<br><b>3.</b> Paste the resulting URL here (e.g., https://.../game.html).<br><b>4.</b> Copy the final iframe code for Genially below.", labelGithubUrl: "URL of the file on GitHub Pages:", labelOutputGithubIframe: "Final code for Genially:", copySuccess: "Code copied!", downloadSuccess: "File downloaded!" }
+    ru: { editorTitle: "Редактор Игры", previewTitle: "Превью Игры", sectionGeneral: "1. Общие настройки", labelGameTitle: "Название/тема игры:", sectionAppearance: "2. Внешний вид", labelBgColor: "Цвет фона:", labelDefinitionBgColor: "Фон блока вопроса:", labelBtnCheckBgColor: 'Цвет фона "Проверить":', labelBtnCheckTextColor: 'Цвет текста "Проверить":', labelBtnRestartBgColor: 'Цвет фона "Сброс":', labelBtnRestartTextColor: 'Цвет текста "Сброс":', labelBtnRadius: "Скругленность углов:", sectionGameType: "3. Тип игры", labelGameType: "Выберите тип задания:", sectionContent: "4. Содержимое игры", labelGameData: "Вопросы и ответы:", helpText: "Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b>", sectionFeedback: "5. Обратная связь", labelFeedbackCorrect: "Текст при верном ответе:", labelFeedbackCorrectImg: "Изображение (URL):", labelFeedbackIncorrect: "Текст при неверном ответе:", labelFeedbackIncorrectImg: "Изображение (URL):", labelFeedbackFinal: "Текст по завершении игры:", labelFinalEffectSelect: "Финальный эффект:", generateBtn: "Сгенерировать код", sectionCode: "6. Готовый код", labelOutputIframe: "Код для вставки в Genially (iframe):", labelOutputCode: "Полный HTML-код (для скачивания):", copySuccess: "Код скопирован!", downloadSuccess: "Файл скачан!" },
+    en: { editorTitle: "Game Editor", previewTitle: "Game Preview", sectionGeneral: "1. General Settings", labelGameTitle: "Game Title/Theme:", sectionAppearance: "2. Appearance", labelBgColor: "Background Color:", labelDefinitionBgColor: "Question block background:", labelBtnCheckBgColor: "Check button background:", labelBtnCheckTextColor: "Check button text:", labelBtnRestartBgColor: "Restart button background:", labelBtnRestartTextColor: "Restart button text:", labelBtnRadius: "Button corner rounding:", sectionGameType: "3. Game Type", labelGameType: "Choose task type:", sectionContent: "4. Game Content", labelGameData: "Questions and Answers:", helpText: "Format: <b>Question | Answer | Image URL (optional)</b>", sectionFeedback: "5. Feedback", labelFeedbackCorrect: "Text for correct answer:", labelFeedbackCorrectImg: "Image (URL):", labelFeedbackIncorrect: "Text for incorrect answer:", labelFeedbackIncorrectImg: "Image (URL):", labelFeedbackFinal: "Text for game completion:", labelFinalEffectSelect: "Final Effect:", generateBtn: "Generate Code", sectionCode: "6. Resulting Code", labelOutputIframe: "Code for embedding in Genially (iframe):", labelOutputCode: "Full HTML code (for download):", copySuccess: "Code copied!", downloadSuccess: "File downloaded!" }
 };
 let currentLang = "ru";
 const UI = {
-    bgColor: document.getElementById("bg-color"), definitionBgColor: document.getElementById("definition-bg-color"), btnCheckBgColor: document.getElementById("btn-check-bg-color"), btnCheckTextColor: document.getElementById("btn-check-text-color"), btnRestartBgColor: document.getElementById("btn-restart-bg-color"), btnRestartTextColor: document.getElementById("btn-restart-text-color"), btnRadius: document.getElementById("btn-radius"), btnRadiusValue: document.getElementById("btn-radius-value"), gameTitle: document.getElementById("game-title"), gameType: document.getElementById("game-type"), gameData: document.getElementById("game-data"), feedbackCorrect: document.getElementById("feedback-correct"), feedbackCorrectImg: document.getElementById("feedback-correct-img"), feedbackIncorrect: document.getElementById("feedback-incorrect"), feedbackIncorrectImg: document.getElementById("feedback-incorrect-img"), feedbackFinal: document.getElementById("feedback-final"), finalEffectSelect: document.getElementById("final-effect-select"), finalEffectCustomUrl: document.getElementById("final-effect-custom-url"), generateBtn: document.getElementById("generate-btn"), langToggle: document.getElementById("lang-toggle"), outputCode: document.getElementById("output-code"), outputIframe: document.getElementById("output-iframe"), previewFrame: document.getElementById("preview-container"), copyIframeBtn: document.getElementById("copy-iframe-btn"), copyHtmlBtn: document.getElementById("copy-html-btn"), downloadHtmlBtn: document.getElementById("download-html-btn"),
-    githubUrl: document.getElementById("github-url"), // НОВЫЙ ЭЛЕМЕНТ
-    outputGithubIframe: document.getElementById("output-github-iframe"), // НОВЫЙ ЭЛЕМЕНТ
-    copyGithubIframeBtn: document.getElementById("copy-github-iframe-btn") // НОВЫЙ ЭЛЕМЕНТ
+    bgColor: document.getElementById("bg-color"), definitionBgColor: document.getElementById("definition-bg-color"), btnCheckBgColor: document.getElementById("btn-check-bg-color"), btnCheckTextColor: document.getElementById("btn-check-text-color"), btnRestartBgColor: document.getElementById("btn-restart-bg-color"), btnRestartTextColor: document.getElementById("btn-restart-text-color"), btnRadius: document.getElementById("btn-radius"), btnRadiusValue: document.getElementById("btn-radius-value"), gameTitle: document.getElementById("game-title"), gameType: document.getElementById("game-type"), gameData: document.getElementById("game-data"), feedbackCorrect: document.getElementById("feedback-correct"), feedbackCorrectImg: document.getElementById("feedback-correct-img"), feedbackIncorrect: document.getElementById("feedback-incorrect"), feedbackIncorrectImg: document.getElementById("feedback-incorrect-img"), feedbackFinal: document.getElementById("feedback-final"), finalEffectSelect: document.getElementById("final-effect-select"), finalEffectCustomUrl: document.getElementById("final-effect-custom-url"), generateBtn: document.getElementById("generate-btn"), langToggle: document.getElementById("lang-toggle"), outputCode: document.getElementById("output-code"), outputIframe: document.getElementById("output-iframe"), previewFrame: document.getElementById("preview-container"), copyIframeBtn: document.getElementById("copy-iframe-btn"), copyHtmlBtn: document.getElementById("copy-html-btn"), downloadHtmlBtn: document.getElementById("download-html-btn")
 };
 
 // --- FUNCTIONS ---
@@ -196,19 +178,14 @@ function generateGame() {
     const gameHtml = UI.gameType.value === 'anagram' ? generateAnagramGame(settings, gameData) : generateInputGame(settings, gameData);
 
     UI.outputCode.value = gameHtml;
-    UI.outputIframe.value = `<iframe srcdoc="${gameHtml.replace(/"/g, '&quot;')}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" title="Game"></iframe>`;
-    UI.previewFrame.srcdoc = gameHtml;
-    updateGithubIframe(); // ОБНОВЛЯЕМ IFRAME ДЛЯ GITHUB
-}
+    
+    // *** ИЗМЕНЕНИЕ ЗДЕСЬ: Генерируем iframe с Data URI ***
+    // Это кодирует весь HTML в строку, которую можно вставить прямо в src
+    const dataUri = 'data:text/html;charset=utf-8,' + encodeURIComponent(gameHtml);
+    UI.outputIframe.value = `<iframe src="${dataUri}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" title="Game"></iframe>`;
 
-// НОВАЯ ФУНКЦИЯ
-function updateGithubIframe() {
-    const url = UI.githubUrl.value.trim();
-    if (url) {
-        UI.outputGithubIframe.value = `<iframe src="${url}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" title="Game"></iframe>`;
-    } else {
-        UI.outputGithubIframe.value = "";
-    }
+    // Для превью по-прежнему используем srcdoc, так как это эффективнее для локального отображения
+    UI.previewFrame.srcdoc = gameHtml;
 }
 
 function getFinalEffectUrl(settings) {
@@ -255,15 +232,6 @@ UI.downloadHtmlBtn.addEventListener("click", () => {
     URL.revokeObjectURL(a.href);
     alert(translations[currentLang].downloadSuccess);
 });
-
-// НОВЫЕ СЛУШАТЕЛИ СОБЫТИЙ
-UI.githubUrl.addEventListener("input", updateGithubIframe);
-UI.copyGithubIframeBtn.addEventListener("click", () => {
-    if(UI.outputGithubIframe.value){
-        navigator.clipboard.writeText(UI.outputGithubIframe.value).then(() => alert(translations[currentLang].copySuccess));
-    }
-});
-
 window.addEventListener("load", () => {
     setLanguage("ru");
     generateGame();
