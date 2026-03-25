@@ -124,11 +124,11 @@ function generateGame() {
 
     document.getElementById('output-code').value = gameHtml;
     
-    // *** ВОТ МАГИЯ, КОТОРАЯ РАБОТАЕТ ***
-    // 1. Кодируем весь HTML-код игры в формат, безопасный для URL.
+    // *** ИСПРАВЛЕНИЕ ЗДЕСЬ ***
+    // 1. Кодируем HTML-код игры в формат, безопасный для URL.
     const encodedHtml = encodeURIComponent(gameHtml);
-    // 2. Создаем публичную ссылку с помощью сервиса htmy.net, который "развернет" наш код.
-    const publicUrl = `https://www.htmy.net/#${encodedHtml}`;
+    // 2. Используем надежный сервис httpsms.com для отображения кода.
+    const publicUrl = `https://wwwms.com/#${encodedHtml}`;
     // 3. Формируем готовый iframe, который Genially примет.
     document.getElementById('output-iframe').value = `<iframe src="${publicUrl}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" allow="autoplay; fullscreen" title="${s.gameTitle}"></iframe>`;
     
