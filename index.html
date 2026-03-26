@@ -116,7 +116,7 @@
     <div class="help-text" id="help-text">Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b></div>
     <textarea id="game-data">Самая большая планета Солнечной системы | Юпитер | https://i.ibb.co/L8y2hQZ/jupiter.png
 Столица Японии | Токио | https://i.ibb.co/Wc6YpQ8/tokyo.jpg
-Процесс превращения воды в пар | Испарение |</textarea>
+Process of water turning into vapor | Evaporation |</textarea>
 
     <h2 id="section-feedback">5. Обратная связь</h2>
     <label for="feedback-correct" id="label-feedback-correct">Текст при верном ответе:</label><input type="text" id="feedback-correct" value="Верно! Отлично!" />
@@ -129,6 +129,7 @@
     <select id="final-effect-select">
       <option value="none">Без эффекта</option>
       <option value="custom">Своя GIF-анимация</option>
+      <option value="firefork">Firefork (огонь)</option>
     </select>
     <input type="url" id="final-effect-custom-url" placeholder="https://example.com/your.gif" style="display:none;" />
 
@@ -150,6 +151,7 @@
   </div>
 
 <script>
+// <------ translations (обновлено для EN) -------->
 const translations = {
     ru: {
         editorTitle: "Редактор Игры",
@@ -184,12 +186,42 @@ const translations = {
         copySuccess: "Код скопирован!",
         downloadSuccess: "Файл скачан!"
     },
-    en: { /* ... тут английские переводы ... */ }
+    en: {
+        editorTitle: "Game Editor",
+        previewTitle: "Game Preview",
+        sectionGeneral: "1. General Settings",
+        labelGameTitle: "Game Title/Theme:",
+        sectionAppearance: "2. Appearance",
+        labelBgColor: "Background Color:",
+        labelTransparentBg: "Make background transparent",
+        labelDefinitionBgColor: "Question block background:",
+        labelBtnCheckBgColor: "Check button background:",
+        labelBtnCheckTextColor: "Check button text:",
+        labelBtnRestartBgColor: "Restart button background:",
+        labelBtnRestartTextColor: "Restart button text:",
+        labelBtnRadius: "Button corner rounding:",
+        sectionGameType: "3. Game Type",
+        labelGameType: "Choose task type:",
+        sectionContent: "4. Game Content",
+        labelGameData: "Questions and Answers:",
+        helpText: "Format: <b>Question | Answer | Image URL (optional)</b>",
+        sectionFeedback: "5. Feedback",
+        labelFeedbackCorrect: "Text for correct answer:",
+        labelFeedbackCorrectImg: "Image (URL):",
+        labelFeedbackIncorrect: "Text for incorrect answer:",
+        labelFeedbackIncorrectImg: "Image (URL):",
+        labelFeedbackFinal: "Text for game completion:",
+        labelFinalEffectSelect: "Final Effect:",
+        generateBtn: "Generate & Update Preview",
+        sectionCode: "6. Final Code",
+        labelOutputIframe: "1. Code to embed in Genially:",
+        labelOutputCode: "2. Full HTML (alternative):",
+        copySuccess: "Code copied!",
+        downloadSuccess: "File downloaded!"
+    }
 };
 
 let currentLang = "ru";
-
-// --- Градиенты и цвета
 
 function getFillValue(type, colorId) {
     const sel = document.querySelector('.fill-type[data-target="' + colorId + '"]');
@@ -208,7 +240,6 @@ function getSettings() {
         const key = el.id.replace(/-([a-z])/g, g => g[1].toUpperCase());
         s[key] = el.type === 'checkbox' ? el.checked : el.value;
     });
-    // Цвета и градиенты:
     s.bgFill = getFillValue("fill", "bg-color");
     s.definitionBgFill = getFillValue("fill", "definition-bg-color");
     s.btnCheckBgFill = getFillValue("fill", "btn-check-bg-color");
@@ -225,37 +256,8 @@ function styleFillString(fillObj) {
     }
 }
 
-function generateGame() {
-    const s = getSettings();
-    const gameData = s.gameData.trim().split('\n').map(line => {
-        const parts = line.split('|');
-        return parts.length < 2 || !parts[0].trim() || !parts[1].trim() ? null : { q: parts[0].trim(), a: parts[1].trim(), img: (parts[2] || "").trim() };
-    }).filter(Boolean);
-
-    const gameHtml = s.gameType === 'anagram'
-        ? generateAnagramGame(s, gameData)
-        : generateInputGame(s, gameData);
-
-    document.getElementById('output-code').value = gameHtml;
-
-    const escapedHtml = gameHtml.replace(/"/g, '&quot;');
-    document.getElementById('output-iframe').value = `<iframe srcdoc="${escapedHtml}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" title="${s.gameTitle}"></iframe>`;
-
-    document.getElementById('preview-container').srcdoc = gameHtml;
-}
-
-function setLanguage(lang) {
-    currentLang = lang;
-    const t = translations[lang];
-    document.querySelectorAll("[id]").forEach(el => {
-        const key = el.id.replace(/-([a-z])/g, g => g[1].toUpperCase());
-        if (t[key] && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA' && el.tagName !== 'SELECT') {
-             el.innerHTML = t[key];
-        }
-    });
-}
-
 function getFinalEffectUrl(s) {
+    if (s.finalEffectSelect === "firefork") return "firefork";
     if (s.finalEffectSelect === 'custom') return s.finalEffectCustomUrl;
     return "";
 }
@@ -287,12 +289,12 @@ h1{margin:0 0 15px}
 .correct{color:#28a745}.error{color:#dc3545}
 .button{border:none;border-radius:${s.btnRadius}px;cursor:pointer;font-weight:bold;padding:12px 24px;margin:5px;user-select:none;transition:filter 0.2s}
 .button:hover{filter:brightness(0.9)}
-.final-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:999;cursor:pointer}
-.final-overlay img{max-width:90vw;max-height:90vh;border-radius:12px}
+.final-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:999;cursor:pointer}
+.final-overlay img, .final-overlay iframe{max-width:90vw;max-height:90vh;border-radius:12px}
 `;
 }
 
-// Анаграмма (Режим 1)
+// ---- АНАГРАММА ----
 function generateAnagramGame(s, data) {
     const css =
         generateBaseCss(s) +
@@ -335,7 +337,11 @@ function l(){
         if(u){
             const e=document.createElement("div");
             e.className="final-overlay";
-            e.innerHTML=\`<img src="\${u}">\`;
+            if(u==="firefork"){
+                e.innerHTML='<iframe src="https://trualinka.github.io/firefork/" style="border:none;width:95vw;height:60vh;" allowfullscreen></iframe>';
+            }else{
+                e.innerHTML=\`<img src="\${u}">\`;
+            }
             e.onclick=()=>e.remove();
             document.body.appendChild(e)
         }
@@ -388,10 +394,11 @@ l();
     return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${s.gameTitle}</title><style>${css}</style></head><body><div class="container"><h1>${s.gameTitle}</h1><img id="game-image" src=""><p class="definition"></p><div class="answer-display"></div><div class="letter-pool"></div><div class="controls"><button id="check-btn" class="button">Проверить</button><button id="clear-btn" class="button">Сброс</button></div><p id="feedback"></p><img id="feedback-image"></div><script>${js}<\/script></body></html>`;
 }
 
-// Собрать из букв с лишними (Режим 2)
+// ---- СОБРАТЬ ИЗ БУКВ ----
 function generateInputGame(s, data) {
 const css = generateBaseCss(s) + `
 #answer-place { min-height: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 15px 0 25px; background: #f3f3f3; border-radius: 8px; border:2px dashed #ddd; padding: 15px;}
+#letter-pool { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;}
 .letter-btn{font-size:1.3em;width:46px;height:46px;${getFillCss(s.btnCheckBgFill)}color:${s.btnCheckTextColor};display:flex;justify-content:center;align-items:center; border:none; border-radius: ${s.btnRadius}px; cursor:pointer;}
 .letter-btn.placed{background-color:#bdbdbd;cursor:default;}
 .controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:15px;}
@@ -436,7 +443,11 @@ function l(){
     if(u){
       const e=document.createElement("div");
       e.className="final-overlay";
-      e.innerHTML=\`<img src="\${u}">\`;
+      if(u==="firefork"){
+        e.innerHTML='<iframe src="https://trualinka.github.io/firefork/" style="border:none;width:95vw;height:60vh;" allowfullscreen></iframe>';
+      }else{
+        e.innerHTML=\`<img src="\${u}">\`;
+      }
       e.onclick=()=>e.remove();
       document.body.appendChild(e);
     }
@@ -450,9 +461,10 @@ function l(){
   E.answerPlace.style.display="";
   E.letterPool.innerHTML="";
   E.letterPool.style.display="";
-  // Генерируем буквы
+  // Генерируем буквы для ответа
   const cleanA = a.toUpperCase().replace(/\\s/g,"");
-  const abc = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+  const isEnglish = /^[A-Z]+$/.test(cleanA);
+  const abc = isEnglish ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
   let letters = cleanA.split('');
   let set = [...letters];
   let extras = (letters.length <= 4 ? 2 : 4);
@@ -475,7 +487,6 @@ function l(){
     btn.onclick=()=>{
       if(btn.classList.contains("placed")) return;
       btn.classList.add("placed");
-      // Новая буква в поле ответа
       const abtn=document.createElement("button");
       abtn.className="letter-btn";
       abtn.textContent=letter;
@@ -487,8 +498,6 @@ function l(){
     E.letterPool.appendChild(btn);
   });
 }
-
-// Проверка и сброс
 function getAnswer(){
   return [...E.answerPlace.children].map(e=>e.textContent).join("");
 }
@@ -521,7 +530,7 @@ l();
   <img id="game-image" src="">
   <p class="definition"></p>
   <div id="answer-place"></div>
-  <div id="letter-pool" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;"></div>
+  <div id="letter-pool"></div>
   <div class="controls">
     <button id="check-btn" class="button">Проверить</button>
     <button id="clear-btn" class="button">Сброс</button>
@@ -580,7 +589,7 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById('btn-radius-value').textContent = this.value + 'px';
     });
     setLanguage("ru");
-    generateGame(); // Initial generation on page load
+    generateGame();
 });
 </script>
 </body>
