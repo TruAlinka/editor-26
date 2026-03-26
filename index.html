@@ -149,9 +149,7 @@ Process of water turning into vapor | Evaporation |</textarea>
     <h1 id="preview-title">Превью Игры</h1>
     <iframe id="preview-container" title="Превью игры"></iframe>
   </div>
-
 <script>
-// <------ translations (обновлено для EN) -------->
 const translations = {
     ru: {
         editorTitle: "Редактор Игры",
@@ -223,7 +221,8 @@ const translations = {
 
 let currentLang = "ru";
 
-function getFillValue(type, colorId) {
+// ——— СЛУЖЕБНЫЕ ФУНКЦИИ (выбор цвета/градиента и генерация CSS) ———
+function getFillValue(colorId) {
     const sel = document.querySelector('.fill-type[data-target="' + colorId + '"]');
     const gradientInput = document.querySelector('.gradient-input[data-target="' + colorId + '"]');
     const colorInput = document.getElementById(colorId);
@@ -233,53 +232,34 @@ function getFillValue(type, colorId) {
         return {type: "color", value: colorInput.value.trim()};
     }
 }
-
 function getSettings() {
     const s = {};
     document.querySelectorAll('.editor input, .editor select, .editor textarea').forEach(el => {
         const key = el.id.replace(/-([a-z])/g, g => g[1].toUpperCase());
         s[key] = el.type === 'checkbox' ? el.checked : el.value;
     });
-    s.bgFill = getFillValue("fill", "bg-color");
-    s.definitionBgFill = getFillValue("fill", "definition-bg-color");
-    s.btnCheckBgFill = getFillValue("fill", "btn-check-bg-color");
-    s.btnRestartBgFill = getFillValue("fill", "btn-restart-bg-color");
+    s.bgFill = getFillValue("bg-color");
+    s.definitionBgFill = getFillValue("definition-bg-color");
+    s.btnCheckBgFill = getFillValue("btn-check-bg-color");
+    s.btnRestartBgFill = getFillValue("btn-restart-bg-color");
     return s;
 }
-
-function styleFillString(fillObj) {
-    if (!fillObj) return "";
-    if (fillObj.type === "gradient" && fillObj.value) {
-        return `background: ${fillObj.value} !important;`;
-    } else {
-        return `background: ${fillObj.value} !important;`;
-    }
+function getFillCss(obj, prop="background") {
+    if (!obj) return "";
+    if (obj.type === "gradient" && obj.value) return `${prop}: ${obj.value} !important;`;
+    return obj.value ? `${prop}: ${obj.value} !important;` : "";
 }
-
 function getFinalEffectUrl(s) {
     if (s.finalEffectSelect === "firefork") return "firefork";
     if (s.finalEffectSelect === 'custom') return s.finalEffectCustomUrl;
     return "";
 }
-
-function getFillCss(obj, property = "background") {
-    if (!obj) return "";
-    if (obj.type === "gradient" && obj.value) {
-        return `${property}: ${obj.value} !important;`;
-    } else {
-        return obj.value ? `${property}: ${obj.value} !important;` : "";
-    }
-}
-
 function generateBaseCss(s) {
-    let finalBg = s.transparentBg ? 'transparent' : (s.bgFill && s.bgFill.type === "gradient" ? s.bgFill.value : s.bgColor);
-    let bgCss;
-    if (s.bgFill && s.bgFill.type === "gradient" && s.bgFill.value) {
-        bgCss = `background:${s.bgFill.value};`;
-    } else {
-        bgCss = `background-color:${s.transparentBg ? 'transparent' : s.bgColor};`;
-    }
-    return `body{font-family:sans-serif;${bgCss}margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;box-sizing:border-box}
+    let bgCss = s.bgFill?.type === "gradient" && s.bgFill.value
+        ? `background:${s.bgFill.value};`
+        : `background-color:${s.transparentBg ? 'transparent' : s.bgColor || '#f0f8ff'};`;
+    return `
+body{font-family:sans-serif;${bgCss}margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;box-sizing:border-box}
 .container{background:white;max-width:600px;width:90%;padding:20px;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,0.1);text-align:center}
 h1{margin:0 0 15px}
 #game-image{max-width:100%;max-height:150px;border-radius:8px;margin:0 auto 20px;object-fit:contain;display:block}
@@ -290,26 +270,21 @@ h1{margin:0 0 15px}
 .button{border:none;border-radius:${s.btnRadius}px;cursor:pointer;font-weight:bold;padding:12px 24px;margin:5px;user-select:none;transition:filter 0.2s}
 .button:hover{filter:brightness(0.9)}
 .final-overlay{position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:999;cursor:pointer}
-.final-overlay img, .final-overlay iframe{max-width:90vw;max-height:90vh;border-radius:12px}
-`;
-}
+.final-overlay img,.final-overlay iframe{max-width:90vw;max-height:90vh;border-radius:12px}
+`;}
 
-// ---- АНАГРАММА ----
+// ——— ГЕНЕРАЦИЯ РЕЖИМОВ ———
 function generateAnagramGame(s, data) {
-    const css =
-        generateBaseCss(s) +
-        getFillCss(s.btnCheckBgFill, "background-color") +
-        getFillCss(s.btnRestartBgFill, "background-color") +
+    const css = generateBaseCss(s) +
         `
-#clear-btn{${getFillCss(s.btnRestartBgFill, "background")}${getFillCss(s.btnRestartBgFill, "background-color")};color:${s.btnRestartTextColor}}
-#check-btn{${getFillCss(s.btnCheckBgFill, "background")}${getFillCss(s.btnCheckBgFill, "background-color")};color:${s.btnCheckTextColor}}
-.answer-display, .letter-pool{margin:20px 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
-.answer-display{background:#eee;border-radius:8px;padding:15px;min-height:50px;border:2px dashed #ccc}
+#clear-btn{${getFillCss(s.btnRestartBgFill)}color:${s.btnRestartTextColor};}
+#check-btn{${getFillCss(s.btnCheckBgFill)}color:${s.btnCheckTextColor};}
+.answer-display, .letter-pool{margin:20px 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px;}
+.answer-display{background:#eee;border-radius:8px;padding:15px;min-height:50px;border:2px dashed #ccc;}
 .letter-btn{font-size:1.5em;width:50px;height:50px;background-color:${s.btnCheckBgColor};color:${s.btnCheckTextColor};display:flex;justify-content:center;align-items:center}
 .letter-btn.placed{background-color:#6c757d;cursor:default}
 .controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 `;
-
     const settingsJs = {
         correctText: s.feedbackCorrect,
         correctImg: s.feedbackCorrectImg,
@@ -318,8 +293,7 @@ function generateAnagramGame(s, data) {
         finalText: s.feedbackFinal
     };
     const js = `
-let i=0;
-const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";
+let i=0;const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";
 const E={h:document.querySelector("h1"),img:document.getElementById("game-image"),def:document.querySelector(".definition"),ans:document.querySelector(".answer-display"),pool:document.querySelector(".letter-pool"),fb:document.getElementById("feedback"),fbi:document.getElementById("feedback-image"),ctrls:document.querySelector(".controls")};
 function showFbImg(u){E.fbi.src=u;E.fbi.style.display=u?"block":"none"}
 function l(){
@@ -329,10 +303,8 @@ function l(){
     if(i>=d.length){
         E.def.textContent=s.finalText;
         E.img.style.display="none";
-        E.ans.innerHTML="";
-        E.ans.style.display = "none";
-        E.pool.innerHTML="";
-        E.pool.style.display = "none";
+        E.ans.innerHTML="";E.ans.style.display = "none";
+        E.pool.innerHTML="";E.pool.style.display = "none";
         E.ctrls.style.display="none";
         if(u){
             const e=document.createElement("div");
@@ -377,15 +349,11 @@ function l(){
 E.ctrls.querySelector("#check-btn").onclick=()=>{
     const t=[...E.ans.children].map(e=>e.textContent).join(""),a=d[i].a.toUpperCase().replace(/\\s/g,"");
     if(t===a){
-        E.fb.textContent=s.correctText;
-        E.fb.className="correct";
-        showFbImg(s.correctImg);
+        E.fb.textContent=s.correctText;E.fb.className="correct";showFbImg(s.correctImg);
         i++;
         setTimeout(l,1500)
     }else{
-        E.fb.textContent=s.incorrectText;
-        E.fb.className="error";
-        showFbImg(s.incorrectImg)
+        E.fb.textContent=s.incorrectText;E.fb.className="error";showFbImg(s.incorrectImg)
     }
 };
 E.ctrls.querySelector("#clear-btn").onclick=()=>l();
@@ -394,7 +362,6 @@ l();
     return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${s.gameTitle}</title><style>${css}</style></head><body><div class="container"><h1>${s.gameTitle}</h1><img id="game-image" src=""><p class="definition"></p><div class="answer-display"></div><div class="letter-pool"></div><div class="controls"><button id="check-btn" class="button">Проверить</button><button id="clear-btn" class="button">Сброс</button></div><p id="feedback"></p><img id="feedback-image"></div><script>${js}<\/script></body></html>`;
 }
 
-// ---- СОБРАТЬ ИЗ БУКВ ----
 function generateInputGame(s, data) {
 const css = generateBaseCss(s) + `
 #answer-place { min-height: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 15px 0 25px; background: #f3f3f3; border-radius: 8px; border:2px dashed #ddd; padding: 15px;}
@@ -461,7 +428,6 @@ function l(){
   E.answerPlace.style.display="";
   E.letterPool.innerHTML="";
   E.letterPool.style.display="";
-  // Генерируем буквы для ответа
   const cleanA = a.toUpperCase().replace(/\\s/g,"");
   const isEnglish = /^[A-Z]+$/.test(cleanA);
   const abc = isEnglish ? "ABCDEFGHIJKLMNOPQRSTUVWXYZ" : "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
@@ -473,13 +439,10 @@ function l(){
     set.push(el);
     extras--;
   }
-  // Мешаем
   for (let i=set.length-1;i>0;i--) {
     let j=Math.floor(Math.random()*(i+1));
     [set[i],set[j]]=[set[j],set[i]];
   }
-
-  // Заполняем кнопки
   set.forEach((letter,idx)=>{
     const btn = document.createElement("button");
     btn.className="letter-btn";
@@ -544,6 +507,31 @@ l();
 `;
 }
 
+function generateGame() {
+    const s = getSettings();
+    const gameData = s.gameData.trim().split('\n').map(line => {
+        const parts = line.split('|');
+        return parts.length < 2 || !parts[0].trim() || !parts[1].trim() ? null : { q: parts[0].trim(), a: parts[1].trim(), img: (parts[2] || "").trim() };
+    }).filter(Boolean);
+    const html = s.gameType === 'anagram'
+        ? generateAnagramGame(s, gameData)
+        : generateInputGame(s, gameData);
+    document.getElementById('output-code').value = html;
+    document.getElementById('output-iframe').value =
+      `<iframe srcdoc="${html.replace(/"/g, '&quot;')}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" title="${s.gameTitle}"></iframe>`;
+    document.getElementById('preview-container').srcdoc = html;
+}
+function setLanguage(lang) {
+    currentLang = lang;
+    const t = translations[lang];
+    document.querySelectorAll("[id]").forEach(el => {
+        const key = el.id.replace(/-([a-z])/g, g => g[1].toUpperCase());
+        if (t[key] && el.tagName !== 'INPUT' && el.tagName !== 'TEXTAREA' && el.tagName !== 'SELECT') {
+             el.innerHTML = t[key];
+        }
+    });
+    document.getElementById("lang-toggle").innerHTML = lang === "ru" ? "EN" : "RU";
+}
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('generate-btn').addEventListener('click', generateGame);
     document.getElementById('lang-toggle').addEventListener("click", () => {
