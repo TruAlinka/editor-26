@@ -16,8 +16,10 @@
     .controls-group { display: flex; flex-wrap: wrap; gap: 20px; align-items: center; margin-top: 10px; }
     .control-item { display: flex; flex-direction: column; }
     .control-item-row { display: flex; align-items: center; gap: 10px; }
+    .fill-type-row { flex-direction: row; align-items: center; gap: 4px; margin-top: 5px;}
     input[type='color'] { width: 50px; height: 40px; border: none; padding: 0; cursor: pointer; }
     input[type='range'] { flex-grow: 1; }
+    .gradient-input {margin-top:5px;}
     #generate-btn { width: 100%; padding: 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; margin-top: 20px; }
     #generate-btn:hover { background-color: #0056b3; }
     #lang-toggle { padding: 8px 12px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
@@ -44,7 +46,14 @@
     <div class="controls-group">
       <div class="control-item">
         <label for="bg-color" id="label-bg-color">Цвет фона:</label>
-        <input type="color" id="bg-color" value="#f0f8ff" />
+        <div class="control-item-row fill-type-row">
+            <select class="fill-type" data-target="bg-color">
+                <option value="color">Цвет</option>
+                <option value="gradient">Градиент</option>
+            </select>
+            <input type="color" id="bg-color" value="#f0f8ff" />
+            <input type="text" class="gradient-input" data-target="bg-color" placeholder="CSS градиент" style="display:none;width:200px;" />
+        </div>
       </div>
        <div class="control-item-row" style="margin-top: 30px;">
         <input type="checkbox" id="transparent-bg" style="width: auto;">
@@ -52,18 +61,44 @@
       </div>
     </div>
     <div class="controls-group">
-      <div class="control-item"><label for="btn-check-bg-color" id="label-btn-check-bg-color">Цвет фона "Проверить":</label><input type="color" id="btn-check-bg-color" value="#007bff" /></div>
-      <div class="control-item"><label for="btn-check-text-color" id="label-btn-check-text-color">Цвет текста "Проверить":</label><input type="color" id="btn-check-text-color" value="#ffffff" /></div>
+      <div class="control-item">
+        <label for="btn-check-bg-color" id="label-btn-check-bg-color">Цвет фона "Проверить":</label>
+        <div class="control-item-row fill-type-row">
+            <select class="fill-type" data-target="btn-check-bg-color">
+                <option value="color">Цвет</option>
+                <option value="gradient">Градиент</option>
+            </select>
+            <input type="color" id="btn-check-bg-color" value="#007bff" />
+            <input type="text" class="gradient-input" data-target="btn-check-bg-color" placeholder="CSS градиент" style="display:none;width:200px;" />
+        </div>
+      </div>
+      <div class="control-item">
+        <label for="btn-check-text-color" id="label-btn-check-text-color">Цвет текста "Проверить":</label>
+        <input type="color" id="btn-check-text-color" value="#ffffff" />
+      </div>
     </div>
     <div class="controls-group">
-      <div class="control-item"><label for="btn-restart-bg-color" id="label-btn-restart-bg-color">Цвет фона "Сброс":</label><input type="color" id="btn-restart-bg-color" value="#ffc107" /></div>
-      <div class="control-item"><label for="btn-restart-text-color" id="label-btn-restart-text-color">Цвет текста "Сброс":</label><input type="color" id="btn-restart-text-color" value="#333333" /></div>
+      <div class="control-item">
+        <label for="btn-restart-bg-color" id="label-btn-restart-bg-color">Цвет фона "Сброс":</label>
+        <div class="control-item-row fill-type-row">
+            <select class="fill-type" data-target="btn-restart-bg-color">
+                <option value="color">Цвет</option>
+                <option value="gradient">Градиент</option>
+            </select>
+            <input type="color" id="btn-restart-bg-color" value="#ffc107" />
+            <input type="text" class="gradient-input" data-target="btn-restart-bg-color" placeholder="CSS градиент" style="display:none;width:200px;" />
+        </div>
+      </div>
+      <div class="control-item">
+        <label for="btn-restart-text-color" id="label-btn-restart-text-color">Цвет текста "Сброс":</label>
+        <input type="color" id="btn-restart-text-color" value="#333333" />
+      </div>
     </div>
     <div><label for="btn-radius" id="label-btn-radius">Скругленность углов:</label><div class="control-item-row"><input type="range" id="btn-radius" min="0" max="25" value="8" /><span id="btn-radius-value">8px</span></div></div>
 
     <h2 id="section-game-type">3. Тип игры</h2>
     <label for="game-type" id="label-game-type">Выберите тип задания:</label>
-    <select id="game-type"><option value="anagram">Расставить буквы</option><option value="input">Впечатать ответ</option></select>
+    <select id="game-type"><option value="anagram">Расставить буквы</option><option value="input">Собрать из букв (с лишними)</option></select>
 
     <h2 id="section-content">4. Содержимое игры</h2>
     <label for="game-data" id="label-game-data">Вопросы и ответы:</label>
@@ -105,10 +140,89 @@
 
 <script>
 const translations = {
-    ru: { editorTitle: "Редактор Игры", previewTitle: "Превью Игры", sectionGeneral: "1. Общие настройки", labelGameTitle: "Название/тема игры:", sectionAppearance: "2. Внешний вид", labelBgColor: "Цвет фона:", labelTransparentBg: "Сделать фон прозрачным", labelDefinitionBgColor: "Фон блока вопроса:", labelBtnCheckBgColor: 'Цвет фона "Проверить":', labelBtnCheckTextColor: 'Цвет текста "Проверить":', labelBtnRestartBgColor: 'Цвет фона "Сброс":', labelBtnRestartTextColor: 'Цвет текста "Сброс":', labelBtnRadius: "Скругленность углов:", sectionGameType: "3. Тип игры", labelGameType: "Выберите тип задания:", sectionContent: "4. Содержимое игры", labelGameData: "Вопросы и ответы:", helpText: "Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b>", sectionFeedback: "5. Обратная связь", labelFeedbackCorrect: "Текст при верном ответе:", labelFeedbackCorrectImg: "Изображение (URL):", labelFeedbackIncorrect: "Текст при неверном ответе:", labelFeedbackIncorrectImg: "Изображение (URL):", labelFeedbackFinal: "Текст по завершении игры:", labelFinalEffectSelect: "Финальный эффект:", generateBtn: "Сгенерировать и обновить превью", sectionCode: "6. Готовый код", labelOutputIframe: "1. Код для вставки в Genially:", labelOutputCode: "2. Полный HTML-код (альтернатива):", copySuccess: "Код скопирован!", downloadSuccess: "Файл скачан!" },
-    en: { editorTitle: "Game Editor", previewTitle: "Game Preview", sectionGeneral: "1. General Settings", labelGameTitle: "Game Title/Theme:", sectionAppearance: "2. Appearance", labelBgColor: "Background Color:", labelTransparentBg: "Make background transparent", labelDefinitionBgColor: "Question block background:", labelBtnCheckBgColor: "Check button background:", labelBtnCheckTextColor: "Check button text:", labelBtnRestartBgColor: "Restart button background:", labelBtnRestartTextColor: "Restart button text:", labelBtnRadius: "Button corner rounding:", sectionGameType: "3. Game Type", labelGameType: "Choose task type:", sectionContent: "4. Game Content", labelGameData: "Questions and Answers:", helpText: "Format: <b>Question | Answer | Image URL (optional)</b>", sectionFeedback: "5. Feedback", labelFeedbackCorrect: "Text for correct answer:", labelFeedbackCorrectImg: "Image (URL):", labelFeedbackIncorrect: "Text for incorrect answer:", labelFeedbackIncorrectImg: "Image (URL):", labelFeedbackFinal: "Text for game completion:", labelFinalEffectSelect: "Final Effect:", generateBtn: "Generate & Update Preview", sectionCode: "6. Final Code", labelOutputIframe: "1. Code to embed in Genially:", labelOutputCode: "2. Full HTML (alternative):", copySuccess: "Code copied!", downloadSuccess: "File downloaded!" }
+    ru: {
+        editorTitle: "Редактор Игры",
+        previewTitle: "Превью Игры",
+        sectionGeneral: "1. Общие настройки",
+        labelGameTitle: "Название/тема игры:",
+        sectionAppearance: "2. Внешний вид",
+        labelBgColor: "Цвет фона:",
+        labelTransparentBg: "Сделать фон прозрачным",
+        labelDefinitionBgColor: "Фон блока вопроса:",
+        labelBtnCheckBgColor: 'Цвет фона "Проверить":',
+        labelBtnCheckTextColor: 'Цвет текста "Проверить":',
+        labelBtnRestartBgColor: 'Цвет фона "Сброс":',
+        labelBtnRestartTextColor: 'Цвет текста "Сброс":',
+        labelBtnRadius: "Скругленность углов:",
+        sectionGameType: "3. Тип игры",
+        labelGameType: "Выберите тип задания:",
+        sectionContent: "4. Содержимое игры",
+        labelGameData: "Вопросы и ответы:",
+        helpText: "Формат: <b>Вопрос | Ответ | Ссылка на картинку (необязательно)</b>",
+        sectionFeedback: "5. Обратная связь",
+        labelFeedbackCorrect: "Текст при верном ответе:",
+        labelFeedbackCorrectImg: "Изображение (URL):",
+        labelFeedbackIncorrect: "Текст при неверном ответе:",
+        labelFeedbackIncorrectImg: "Изображение (URL):",
+        labelFeedbackFinal: "Текст по завершении игры:",
+        labelFinalEffectSelect: "Финальный эффект:",
+        generateBtn: "Сгенерировать и обновить превью",
+        sectionCode: "6. Готовый код",
+        labelOutputIframe: "1. Код для вставки в Genially:",
+        labelOutputCode: "2. Полный HTML-код (альтернатива):",
+        copySuccess: "Код скопирован!",
+        downloadSuccess: "Файл скачан!"
+    },
+    en: {
+        editorTitle: "Game Editor",
+        previewTitle: "Game Preview",
+        sectionGeneral: "1. General Settings",
+        labelGameTitle: "Game Title/Theme:",
+        sectionAppearance: "2. Appearance",
+        labelBgColor: "Background Color:",
+        labelTransparentBg: "Make background transparent",
+        labelDefinitionBgColor: "Question block background:",
+        labelBtnCheckBgColor: "Check button background:",
+        labelBtnCheckTextColor: "Check button text:",
+        labelBtnRestartBgColor: "Restart button background:",
+        labelBtnRestartTextColor: "Restart button text:",
+        labelBtnRadius: "Button corner rounding:",
+        sectionGameType: "3. Game Type",
+        labelGameType: "Choose task type:",
+        sectionContent: "4. Game Content",
+        labelGameData: "Questions and Answers:",
+        helpText: "Format: <b>Question | Answer | Image URL (optional)</b>",
+        sectionFeedback: "5. Feedback",
+        labelFeedbackCorrect: "Text for correct answer:",
+        labelFeedbackCorrectImg: "Image (URL):",
+        labelFeedbackIncorrect: "Text for incorrect answer:",
+        labelFeedbackIncorrectImg: "Image (URL):",
+        labelFeedbackFinal: "Text for game completion:",
+        labelFinalEffectSelect: "Final Effect:",
+        generateBtn: "Generate & Update Preview",
+        sectionCode: "6. Final Code",
+        labelOutputIframe: "1. Code to embed in Genially:",
+        labelOutputCode: "2. Full HTML (alternative):",
+        copySuccess: "Code copied!",
+        downloadSuccess: "File downloaded!"
+    }
 };
+
 let currentLang = "ru";
+
+// --- Градиенты и цвета
+
+function getFillValue(type, colorId) {
+    // type: "bg-color", "btn-check-bg-color", "btn-restart-bg-color"
+    const sel = document.querySelector('.fill-type[data-target="' + colorId + '"]');
+    const gradientInput = document.querySelector('.gradient-input[data-target="' + colorId + '"]');
+    const colorInput = document.getElementById(colorId);
+    if (sel && sel.value === "gradient") {
+        return {type: "gradient", value: gradientInput.value.trim()};
+    } else {
+        return {type: "color", value: colorInput.value.trim()};
+    }
+}
 
 function getSettings() {
     const s = {};
@@ -116,8 +230,23 @@ function getSettings() {
         const key = el.id.replace(/-([a-z])/g, g => g[1].toUpperCase());
         s[key] = el.type === 'checkbox' ? el.checked : el.value;
     });
+    // Цвета и градиенты:
+    s.bgFill = getFillValue("fill", "bg-color");
+    s.btnCheckBgFill = getFillValue("fill", "btn-check-bg-color");
+    s.btnRestartBgFill = getFillValue("fill", "btn-restart-bg-color");
     return s;
 }
+
+function styleFillString(fillObj) {
+    if (!fillObj) return "";
+    if (fillObj.type === "gradient" && fillObj.value) {
+        return `background: ${fillObj.value} !important;`;
+    } else {
+        return `background: ${fillObj.value} !important;`;
+    }
+}
+
+// --- Генерация кода игры
 
 function generateGame() {
     const s = getSettings();
@@ -126,13 +255,15 @@ function generateGame() {
         return parts.length < 2 || !parts[0].trim() || !parts[1].trim() ? null : { q: parts[0].trim(), a: parts[1].trim(), img: (parts[2] || "").trim() };
     }).filter(Boolean);
 
-    const gameHtml = s.gameType === 'anagram' ? generateAnagramGame(s, gameData) : generateInputGame(s, gameData);
+    const gameHtml = s.gameType === 'anagram'
+        ? generateAnagramGame(s, gameData)
+        : generateInputGame(s, gameData);
 
     document.getElementById('output-code').value = gameHtml;
-    
+
     const escapedHtml = gameHtml.replace(/"/g, '&quot;');
     document.getElementById('output-iframe').value = `<iframe srcdoc="${escapedHtml}" width="100%" height="720" style="border:none;" allowfullscreen="allowfullscreen" title="${s.gameTitle}"></iframe>`;
-    
+
     document.getElementById('preview-container').srcdoc = gameHtml;
 }
 
@@ -152,12 +283,214 @@ function getFinalEffectUrl(s) {
     return "";
 }
 
-function generateBaseCss(s) { const finalBgColor = s.transparentBg ? 'transparent' : s.bgColor; return `body{font-family:sans-serif;background-color:${finalBgColor};margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;box-sizing:border-box} .container{background:white;max-width:600px;width:90%;padding:20px;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,0.1);text-align:center} h1{margin:0 0 15px} #game-image{max-width:100%;max-height:150px;border-radius:8px;margin:0 auto 20px;object-fit:contain;display:block} .definition{font-size:1.2em;margin-bottom:20px;background-color:${s.definitionBgColor};padding:10px;border-radius:8px;min-height:50px} #feedback{margin-top:20px;font-size:1.1em;font-weight:700;min-height:1.5em} #feedback-image{max-width:80px;margin-top:10px;border-radius:8px;display:none} .correct{color:#28a745}.error{color:#dc3545} .button{border:none;border-radius:${s.btnRadius}px;cursor:pointer;font-weight:bold;padding:12px 24px;margin:5px;user-select:none;transition:filter 0.2s} .button:hover{filter:brightness(0.9)} #check-btn{background-color:${s.btnCheckBgColor};color:${s.btnCheckTextColor}} .final-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:999;cursor:pointer} .final-overlay img{max-width:90vw;max-height:90vh;border-radius:12px}`; }
-function generateAnagramGame(s, data) { const css = generateBaseCss(s) + `#clear-btn{background-color:${s.btnRestartBgColor};color:${s.btnRestartTextColor}} .answer-display,.letter-pool{margin:20px 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px} .answer-display{background:#eee;border-radius:8px;padding:15px;min-height:50px;border:2px dashed #ccc} .letter-btn{font-size:1.5em;width:50px;height:50px;background-color:${s.btnCheckBgColor};color:${s.btnCheckTextColor};display:flex;justify-content:center;align-items:center} .letter-btn.placed{background-color:#6c757d;cursor:default} .controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}`; const settingsJs = {correctText:s.feedbackCorrect,correctImg:s.feedbackCorrectImg,incorrectText:s.feedbackIncorrect,incorrectImg:s.feedbackIncorrectImg,finalText:s.feedbackFinal}; const js = `let i=0;const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";const E={h:document.querySelector("h1"),img:document.getElementById("game-image"),def:document.querySelector(".definition"),ans:document.querySelector(".answer-display"),pool:document.querySelector(".letter-pool"),fb:document.getElementById("feedback"),fbi:document.getElementById("feedback-image"),ctrls:document.querySelector(".controls")};function showFbImg(u){E.fbi.src=u;E.fbi.style.display=u?"block":"none"}function l(){showFbImg(null);E.fb.textContent="";if(i>=d.length){E.def.textContent=s.finalText;E.img.style.display="none";E.ans.innerHTML="";E.pool.innerHTML="";E.ctrls.style.display="none";if(u){const e=document.createElement("div");e.className="final-overlay";e.innerHTML=\`<img src="\${u}">\`;e.onclick=()=>e.remove();document.body.appendChild(e)}return}const{q,a,img}=d[i];E.def.textContent=q;E.img.src=img;E.img.style.display=img?"block":"none";E.ans.innerHTML="";E.pool.innerHTML="";[...a.toUpperCase().replace(/\\s/g,"")].sort(()=>.5-Math.random()).forEach(t=>{const a=document.createElement("button");a.className="button letter-btn";a.textContent=t;a.onclick=()=>{if(a.classList.contains("placed"))return;a.classList.add("placed");const e=document.createElement("button");e.className="button letter-btn";e.textContent=t;e.onclick=()=>{a.classList.remove("placed");e.remove()};E.ans.appendChild(e)};E.pool.appendChild(a)})}E.ctrls.querySelector("#check-btn").onclick=()=>{const t=[...E.ans.children].map(e=>e.textContent).join(""),a=d[i].a.toUpperCase().replace(/\\s/g,"");if(t===a){E.fb.textContent=s.correctText;E.fb.className="correct";showFbImg(s.correctImg);i++;setTimeout(l,1500)}else{E.fb.textContent=s.incorrectText;E.fb.className="error";showFbImg(s.incorrectImg)}};E.ctrls.querySelector("#clear-btn").onclick=()=>l();l();`; return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${s.gameTitle}</title><style>${css}</style></head><body><div class="container"><h1>${s.gameTitle}</h1><img id="game-image" src=""><p class="definition"></p><div class="answer-display"></div><div class="letter-pool"></div><div class="controls"><button id="check-btn" class="button">Проверить</button><button id="clear-btn" class="button">Сброс</button></div><p id="feedback"></p><img id="feedback-image"></div><script>${js}<\/script></body></html>`;}
-function generateInputGame(s, data) { const css = generateBaseCss(s) + `#answer-input{width:60%;padding:10px;font-size:1.1em;text-align:center;border:2px solid #ccc;border-radius:${s.btnRadius}px} #answer-input:focus{border-color:${s.btnCheckBgColor};outline:0} .controls{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap}`; const settingsJs = {correctText:s.feedbackCorrect,correctImg:s.feedbackCorrectImg,incorrectText:s.feedbackIncorrect,incorrectImg:s.feedbackIncorrectImg,finalText:s.feedbackFinal}; const js = `let i=0;const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";const E={h:document.querySelector("h1"),img:document.getElementById("game-image"),def:document.querySelector(".definition"),inp:document.getElementById("answer-input"),fb:document.getElementById("feedback"),fbi:document.getElementById("feedback-image"),ctrls:document.querySelector(".controls")};function showFbImg(u){E.fbi.src=u;E.fbi.style.display=u?"block":"none"}function l(){showFbImg(null);E.fb.textContent="";if(i>=d.length){E.def.textContent=s.finalText;E.img.style.display="none";E.ctrls.style.display="none";if(u){const e=document.createElement("div");e.className="final-overlay";e.innerHTML=\`<img src="\${u}">\`;e.onclick=()=>e.remove();document.body.appendChild(e)}return}const{q,img}=d[i];E.def.textContent=q;E.img.src=img;E.img.style.display=img?"block":"none";E.ctrls.style.display="flex";E.inp.value="";E.inp.focus()}function check(){if(E.inp.value.trim()==="")return;const t=E.inp.value.trim().toLowerCase(),a=d[i].a.trim().toLowerCase();if(t===a){E.fb.textContent=s.correctText;E.fb.className="correct";showFbImg(s.correctImg);i++;setTimeout(l,1500)}else{E.fb.textContent=s.incorrectText;E.fb.className="error";showFbImg(s.incorrectImg)}}E.ctrls.querySelector("#check-btn").onclick=check;E.inp.onkeydown=e=>"Enter"===e.key&&check();l();`; return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${s.gameTitle}</title><style>${css}</style></head><body><div class="container"><h1>${s.gameTitle}</h1><img id="game-image" src=""><p class="definition"></p><div class="controls"><input type="text" id="answer-input" placeholder="Введите ответ..."><button id="check-btn" class="button">Проверить</button></div><p id="feedback"></p><img id="feedback-image"></div><script>${js}<\/script></body></html>`;}
 
+// -------- Стили для разных видов фона/кнопок --------
+function getFillCss(obj, property = "background") {
+    if (!obj) return "";
+    if (obj.type === "gradient" && obj.value) {
+        return `${property}: ${obj.value} !important;`;
+    } else {
+        return obj.value ? `${property}: ${obj.value} !important;` : "";
+    }
+}
+
+function generateBaseCss(s) {
+    let finalBg = s.transparentBg ? 'transparent' : (s.bgFill && s.bgFill.type === "gradient" ? s.bgFill.value : s.bgColor);
+    let bgCss;
+    if (s.bgFill && s.bgFill.type === "gradient" && s.bgFill.value) {
+        bgCss = `background:${s.bgFill.value};`;
+    } else {
+        bgCss = `background-color:${s.transparentBg ? 'transparent' : s.bgColor};`;
+    }
+    return `body{font-family:sans-serif;${bgCss}margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;box-sizing:border-box}
+.container{background:white;max-width:600px;width:90%;padding:20px;border-radius:10px;box-shadow:0 0 15px rgba(0,0,0,0.1);text-align:center}
+h1{margin:0 0 15px}
+#game-image{max-width:100%;max-height:150px;border-radius:8px;margin:0 auto 20px;object-fit:contain;display:block}
+.definition{font-size:1.2em;margin-bottom:20px;padding:10px;border-radius:8px;min-height:50px}
+#feedback{margin-top:20px;font-size:1.1em;font-weight:700;min-height:1.5em}
+#feedback-image{max-width:80px;margin-top:10px;border-radius:8px;display:none}
+.correct{color:#28a745}.error{color:#dc3545}
+.button{border:none;border-radius:${s.btnRadius}px;cursor:pointer;font-weight:bold;padding:12px 24px;margin:5px;user-select:none;transition:filter 0.2s}
+.button:hover{filter:brightness(0.9)}
+.final-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:flex;justify-content:center;align-items:center;z-index:999;cursor:pointer}
+.final-overlay img{max-width:90vw;max-height:90vh;border-radius:12px}
+`;
+}
+
+// ----------- РЕЖИМ 1: Классическая анаграмма (буквы = ответ) -----------------
+function generateAnagramGame(s, data) {
+    const css =
+        generateBaseCss(s) +
+        getFillCss(s.btnCheckBgFill, "background-color") +
+        getFillCss(s.btnRestartBgFill, "background-color") +
+        `
+#clear-btn{${getFillCss(s.btnRestartBgFill, "background")}${getFillCss(s.btnRestartBgFill, "background-color")};color:${s.btnRestartTextColor}}
+#check-btn{${getFillCss(s.btnCheckBgFill, "background")}${getFillCss(s.btnCheckBgFill, "background-color")};color:${s.btnCheckTextColor}}
+.answer-display, .letter-pool{margin:20px 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}
+.answer-display{background:#eee;border-radius:8px;padding:15px;min-height:50px;border:2px dashed #ccc}
+.letter-btn{font-size:1.5em;width:50px;height:50px;background-color:${s.btnCheckBgColor};color:${s.btnCheckTextColor};display:flex;justify-content:center;align-items:center}
+.letter-btn.placed{background-color:#6c757d;cursor:default}
+.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+`;
+
+    const settingsJs = {
+        correctText: s.feedbackCorrect,
+        correctImg: s.feedbackCorrectImg,
+        incorrectText: s.feedbackIncorrect,
+        incorrectImg: s.feedbackIncorrectImg,
+        finalText: s.feedbackFinal
+    };
+    const js = `let i=0;const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";const E={h:document.querySelector("h1"),img:document.getElementById("game-image"),def:document.querySelector(".definition"),ans:document.querySelector(".answer-display"),pool:document.querySelector(".letter-pool"),fb:document.getElementById("feedback"),fbi:document.getElementById("feedback-image"),ctrls:document.querySelector(".controls")};function showFbImg(u){E.fbi.src=u;E.fbi.style.display=u?"block":"none"}function l(){showFbImg(null);E.fb.textContent="";if(i>=d.length){E.def.textContent=s.finalText;E.img.style.display="none";E.ans.innerHTML="";E.pool.innerHTML="";E.ctrls.style.display="none";if(u){const e=document.createElement("div");e.className="final-overlay";e.innerHTML=\`<img src="\${u}">\`;e.onclick=()=>e.remove();document.body.appendChild(e)}return}const{q,a,img}=d[i];E.def.textContent=q;E.img.src=img;E.img.style.display=img?"block":"none";E.ans.innerHTML="";E.pool.innerHTML="";[...a.toUpperCase().replace(/\\s/g,"")].sort(()=>.5-Math.random()).forEach(t=>{const a=document.createElement("button");a.className="button letter-btn";a.textContent=t;a.onclick=()=>{if(a.classList.contains("placed"))return;a.classList.add("placed");const e=document.createElement("button");e.className="button letter-btn";e.textContent=t;e.onclick=()=>{a.classList.remove("placed");e.remove()};E.ans.appendChild(e)};E.pool.appendChild(a)})}E.ctrls.querySelector("#check-btn").onclick=()=>{const t=[...E.ans.children].map(e=>e.textContent).join(""),a=d[i].a.toUpperCase().replace(/\\s/g,"");if(t===a){E.fb.textContent=s.correctText;E.fb.className="correct";showFbImg(s.correctImg);i++;setTimeout(l,1500)}else{E.fb.textContent=s.incorrectText;E.fb.className="error";showFbImg(s.incorrectImg)}};E.ctrls.querySelector("#clear-btn").onclick=()=>l();l();`;
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${s.gameTitle}</title><style>${css}</style></head><body><div class="container"><h1>${s.gameTitle}</h1><img id="game-image" src=""><p class="definition"></p><div class="answer-display"></div><div class="letter-pool"></div><div class="controls"><button id="check-btn" class="button">Проверить</button><button id="clear-btn" class="button">Сброс</button></div><p id="feedback"></p><img id="feedback-image"></div><script>${js}<\/script></body></html>`;
+}
+
+// ----------- РЕЖИМ 2: Собрать слово из букв (с лишними!) -----------------
+function generateInputGame(s, data) {
+const css = generateBaseCss(s) + `
+#answer-place { min-height: 50px; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 15px 0 25px; background: #f3f3f3; border-radius: 8px; border:2px dashed #ddd; padding: 15px;}
+.letter-btn{font-size:1.3em;width:46px;height:46px;${getFillCss(s.btnCheckBgFill)}color:${s.btnCheckTextColor};display:flex;justify-content:center;align-items:center; border:none; border-radius: ${s.btnRadius}px; cursor:pointer;}
+.letter-btn.placed{background-color:#bdbdbd;cursor:default;}
+.controls{display:flex;justify-content:center;align-items:center;gap:10px;margin-bottom:15px;}
+#check-btn{${getFillCss(s.btnCheckBgFill)}color:${s.btnCheckTextColor};}
+#clear-btn{${getFillCss(s.btnRestartBgFill)}color:${s.btnRestartTextColor};}
+`;
+
+const settingsJs = {
+    correctText: s.feedbackCorrect,
+    correctImg: s.feedbackCorrectImg,
+    incorrectText: s.feedbackIncorrect,
+    incorrectImg: s.feedbackIncorrectImg,
+    finalText: s.feedbackFinal
+};
+
+// Сам скрипт игры:
+const js = `
+let i=0;
+const d=${JSON.stringify(data)},s=${JSON.stringify(settingsJs)},u="${getFinalEffectUrl(s)}";
+const E={
+  h:document.querySelector("h1"),
+  img:document.getElementById("game-image"),
+  def:document.querySelector(".definition"),
+  answerPlace:document.getElementById("answer-place"),
+  letterPool:document.getElementById("letter-pool"),
+  fb:document.getElementById("feedback"),
+  fbi:document.getElementById("feedback-image"),
+  ctrls:document.querySelector(".controls")
+};
+
+function showFbImg(u){E.fbi.src=u;E.fbi.style.display=u?"block":"none"}
+
+function l(){
+  showFbImg(null);E.fb.textContent="";
+  if(i>=d.length){
+    E.def.textContent=s.finalText;
+    E.img.style.display="none";
+    E.ctrls.style.display="none";
+    if(u){
+      const e=document.createElement("div");
+      e.className="final-overlay";
+      e.innerHTML=\`<img src="\${u}">\`;
+      e.onclick=()=>e.remove();
+      document.body.appendChild(e);
+    }
+    return;
+  }
+  const {q,a,img} = d[i];
+  E.def.textContent=q;
+  E.img.src=img;E.img.style.display=img?"block":"none";
+  E.ctrls.style.display="flex";
+  E.answerPlace.innerHTML="";
+  E.letterPool.innerHTML="";
+  
+  // Генерируем буквы
+  const cleanA = a.toUpperCase().replace(/\\s/g,"");
+  const abc = "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ";
+  let letters = cleanA.split('');
+  let set = [...letters];
+  let extras = (letters.length <= 4 ? 2 : 4);
+  while (extras>0) {
+    const el = abc[Math.floor(Math.random()*abc.length)];
+    set.push(el);
+    extras--;
+  }
+  // Мешаем
+  for (let i=set.length-1;i>0;i--) {
+    let j=Math.floor(Math.random()*(i+1));
+    [set[i],set[j]]=[set[j],set[i]];
+  }
+
+  // Заполняем кнопки
+  set.forEach((letter,idx)=>{
+    const btn = document.createElement("button");
+    btn.className="letter-btn";
+    btn.textContent=letter;
+    btn.onclick=()=>{
+      if(btn.classList.contains("placed")) return;
+      btn.classList.add("placed");
+      // Новая буква в поле ответа
+      const abtn=document.createElement("button");
+      abtn.className="letter-btn";
+      abtn.textContent=letter;
+      abtn.onclick=()=>{
+        btn.classList.remove("placed");abtn.remove();
+      };
+      E.answerPlace.appendChild(abtn);
+    };
+    E.letterPool.appendChild(btn);
+  });
+}
+
+// Проверка и сброс
+function getAnswer(){
+  return [...E.answerPlace.children].map(e=>e.textContent).join("");
+}
+
+E.ctrls.querySelector("#check-btn").onclick=()=>{
+  const t = getAnswer().toLowerCase(), a = d[i].a.toLowerCase().replace(/\\s/g,"");
+  if(t===a){
+    E.fb.textContent=s.correctText;E.fb.className="correct";showFbImg(s.correctImg);
+    i++;setTimeout(l,1500);
+  }else{
+    E.fb.textContent=s.incorrectText;E.fb.className="error";showFbImg(s.incorrectImg);
+  }
+};
+E.ctrls.querySelector("#clear-btn").onclick=()=>{
+  l();
+};
+
+l();
+`;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${s.gameTitle}</title>
+<style>${css}</style>
+</head>
+<body>
+<div class="container">
+  <h1>${s.gameTitle}</h1>
+  <img id="game-image" src="">
+  <p class="definition"></p>
+  <div id="answer-place"></div>
+  <div id="letter-pool" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;"></div>
+  <div class="controls">
+    <button id="check-btn" class="button">Проверить</button>
+    <button id="clear-btn" class="button">Сброс</button>
+  </div>
+  <p id="feedback"></p>
+  <img id="feedback-image">
+</div>
+<script>${js}<\/script>
+</body>
+</html>
+`;
+}
+
+// ---------------- HANDLERS ------------------------------
 document.addEventListener("DOMContentLoaded", () => {
-    // Generate game only on button click, NOT on every input change.
     document.getElementById('generate-btn').addEventListener('click', generateGame);
 
     document.getElementById('lang-toggle').addEventListener("click", () => {
@@ -186,6 +519,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.getElementById('transparent-bg').addEventListener('change', (e) => {
         document.getElementById('bg-color').disabled = e.target.checked;
+        document.querySelector('.fill-type[data-target="bg-color"]').disabled = e.target.checked;
+        document.querySelector('.gradient-input[data-target="bg-color"]').disabled = e.target.checked;
+    });
+
+    // Связка гендриентов/цветов:
+    document.querySelectorAll('.fill-type').forEach(sel => {
+        const target = sel.getAttribute('data-target');
+        sel.addEventListener('change', function() {
+            const colorInput = document.getElementById(target);
+            const gradientInput = document.querySelector('.gradient-input[data-target="' + target + '"]');
+            if (this.value === "gradient") {
+                colorInput.style.display = "none";
+                gradientInput.style.display = "";
+            } else {
+                colorInput.style.display = "";
+                gradientInput.style.display = "none";
+            }
+        });
+    });
+
+    // Для range
+    document.getElementById('btn-radius').addEventListener('input', function() {
+        document.getElementById('btn-radius-value').textContent = this.value + 'px';
     });
 
     setLanguage("ru");
